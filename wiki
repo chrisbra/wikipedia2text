@@ -8,7 +8,7 @@
 # Author: Christian Brabandt <cb@256bit.org>
 # License: Public Domain
 
-VERSION=0.05
+VERSION=0.06
 
 set -e
 
@@ -247,7 +247,7 @@ IGNCASE=$(echo ${IGNCASE:="false"})
 PAGER=$(echo ${PAGER:="false"})
 
 if [ "$PAGER" = "true" ]; then
-    { PAGER=$(which less) || PAGER=$(which more) ; } #|| errorExit "Kein Pager gefunden!" ;
+    { PAGER=$(which less) || PAGER=$(which more) ; } || errorExit "No Pager found!" ;
 fi
 #fi
 
@@ -259,20 +259,20 @@ if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
     PATT="$*"
 fi
 
-# Per default we use the german localized version of 
+# Per default we use the english localized version of 
 # Wikipedia
 LOCAL=$(echo ${LOCAL:="en"})
 
 # Check for Alternative Browser
 if [ -n "${ABROWSER}" ]; then
-    BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} nicht gefunden"  
+    BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"  
 else
    { BROWSER=$(which elinks) || 
      BROWSER=$(which links2) || 
      BROWSER=$(which lynx) || 
      BROWSER=$(which w3m) || 
      BROWSER=$(which links.main) || 
-     BROWSER=$(which links) ; } || errorExit "kein Browser gefunden"
+     BROWSER=$(which links) ; } || errorExit "No Browser found"
 fi
 
 
@@ -287,7 +287,7 @@ OUTPUTURL=$(echo ${OUTPUTURL:="false"})
 
 # Now translate the input into something, we can use for the Wikipedia
 ARGUMENT="$(echo "$*" |sed -e 's|ü|%C3%BC|g' -e 's|ä|%C3%A4|g' -e 's|ö|%C3%B6|g' -e 's|[[:space:]]|_|g' -e 's|\"||g' -e 's|ß|%C3%9F|g')"
-LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:upper:])"
+LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
 URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
 
 #errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE"
@@ -313,7 +313,7 @@ if [ "${OUTPUTURL}" = "true" ]; then
 fi
 
 if [ "$PAGER" != "false" ]; then
-    getInfo | eval ${PAGER}
+    getInfo | ${PAGER}
 else
     getInfo
 fi
