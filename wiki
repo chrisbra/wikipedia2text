@@ -3,7 +3,7 @@
 # It can be used to output the query to the console, but can also 
 # just open the wikipedia page in any browser.
 
-VERSION=0.02
+VERSION=0.03
 
 function display_help(){
 cat << EOF |less
@@ -18,7 +18,7 @@ SYNOPSIS
     `basename $0` [-h] 
     `basename $0` -v 
    
-    -n	do not colorize
+    -n	do not colorize	
     -o	open wikipedia page in browser	    -s	display only summary
     -u	Just output the Query-URL	    -v	display version
     -C	simple colorization		    -h	display help		   
@@ -40,7 +40,7 @@ EOF
 
 function getVersion(){
 cat <<EOF
-    `basename "${0}"` Version: ${VERSION}
+    "$(basename "${0}")" Version: "${VERSION}"
 EOF
 }
 
@@ -88,12 +88,12 @@ function summary(){
 }
 
 function getInfo(){
-    LINES=`"${BROWSER}" -dump "${URL}" |wc -l`
-    LINES=`expr ${LINES} - 6`
+    LINES=$("${BROWSER}" -dump "${URL}" |wc -l)
+    LINES=$(expr ${LINES} - 6)
     if [ "${COLOR}" = "false" ]; then
-	"${BROWSER}" -dump "${URL}"| tail -n ${LINES}  |stripOutput
+	"${BROWSER}" -dump "${URL}"| tail -n ${LINES}  |stripOutput  
     else
-	"${BROWSER}" -dump "${URL}"| tail -n ${LINES}  |stripOutput |colorize
+	"${BROWSER}" -dump "${URL}"| tail -n ${LINES}  |stripOutput |colorize 
     fi
 }
 
@@ -125,17 +125,13 @@ shift `expr ${OPTIND} - 1`
 
 
 # Setting Up some Variables, to determine, what actually to do
-if [ -z "$1" ]; then
-    display_help
-    exit 1;
-fi
+#if [ -z "$1" ]; then
+#    display_help
+#    exit 1;
+#fi
 
 if [ -z "${IGNCASE}" ]; then
     IGNCASE="false"
-fi
-
-if [ "${COLOR}" != "false" ]; then 
-    PATT="$*"
 fi
 
 if [ -z "${COLOR}" ]; then
@@ -155,31 +151,34 @@ fi
 
 # Check for Alternative Browser
 if [ -n "${ABROWSER}" ]; then
-    BROWSER=`which "${ABROWSER}"` ||  errorExit "${ABROWSER} nicht gefunden"  
+    BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} nicht gefunden"  
 else
-BROWSER=`which elinks`
+   { BROWSER=$(which elinks) || BROWSER=$(which lynx) ; } || errorExit "kein Browser gefunden"
 fi
 
-#errorExit "Broser: $BROWSER Local: $LOCAL COLOR: $COLOR IGNCASE: $IGNCASE"
 
 # Open page in Browser?
 if [ -z "${USEBROWSER}" ]; then
-    USEBROWSER=false
+    USEBROWSER="false"
 fi
 
 # Output only a summary?
 if [ -z  "${SHORT}" ]; then
-    SHORT=false
+    SHORT="false"
 fi
 
 # Output only the URL?
 if [ -z  "${OUTPUTURL}" ]; then
-    OUTPUTURL=false
+    OUTPUTURL="false"
 fi
 
 # Now translate the input into something, we can use for the Wikipedia
-ARGUMENT=`echo "$*" |sed -e 's|ü|%C3%BC|g' -e 's|ä|%C3%A4|g' -e 's|ö|%C3%B6|g' -e 's|[[:space:]]|_|g' -e 's|\"||g' -e 's|ß|%C3%9F|g'`
+ARGUMENT="$(echo "$*" |sed -e 's|ü|%C3%BC|g' -e 's|ä|%C3%A4|g' -e 's|ö|%C3%B6|g' -e 's|[[:space:]]|_|g' -e 's|\"||g' -e 's|ß|%C3%9F|g')"
+LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:upper:])"
 URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
+
+#errorExit "Broser: $BROWSER Local: $LOCAL COLOR: $COLOR IGNCASE: $IGNCASE"
+
 
 # Depending on some Variables, we do some different things here
 if [ "${USEBROWSER}" = "true" ]; then
