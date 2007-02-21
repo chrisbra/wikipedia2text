@@ -6,9 +6,9 @@
 # just open the article in any browser.
 #
 # Author: Christian Brabandt <cb@256bit.org>
-# License: Public Domain
+# License: BSD
 
-VERSION=0.06
+VERSION=0.07
 
 set -e
 
@@ -285,12 +285,12 @@ SHORT=$(echo ${SHORT:="false"})
 # Output only the URL?
 OUTPUTURL=$(echo ${OUTPUTURL:="false"})
 
-# Now translate the input into something, we can use for the Wikipedia
-ARGUMENT="$(echo "$*" |sed -e 's|ü|%C3%BC|g' -e 's|ä|%C3%A4|g' -e 's|ö|%C3%B6|g' -e 's|[[:space:]]|_|g' -e 's|\"||g' -e 's|ß|%C3%9F|g')"
+# Now we do some input sanitizing.
+ARGUMENT="$(echo "$*" |perl -MURI::Escape -lne 's/ /_/g;s/"//g;print uri_escape($_);')"
 LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
 URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
 
-#errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE"
+#errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
 
 # Depending on some Variables, we do some different things here
 if [ "${USEBROWSER}" = "true" ]; then
