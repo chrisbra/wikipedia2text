@@ -23,7 +23,7 @@ SYNOPSIS
     `basename $0` [-BCnNoOpPsSuU] [-b prog] [-c patt] [-i patt] [-l lang] query
     `basename $0` -o [-b prog] [-l lang] query
     `basename $0` [-h]
-    `basename $0` -v
+    `basename $0` -v|-r
    
     -n	do not colorize			    -N	simple colorization (alias -C)
     -p	display using a pager		    -P  don't use pager
