@@ -29,7 +29,7 @@ SYNOPSIS
     -p	display using a pager		    -P  don't use pager
     -o	open Wikipedia article in browser   -O	don't open in browser
     -s	display only a summary		    -S	display whole article
-    -u	Just output the query URL	    -U	display article, not only url
+    -u	Just output the query URL	    -U	open URL in browser
     -v	display version			    -h	display help		   
 
     -r          open Random Page
@@ -247,7 +247,7 @@ if [ -r ~/.`basename $0`rc ]; then
 fi
 
 # Process commandline parameters
-while getopts "BCnNoOpPsSuUvhrl:b:c:i:B:" ARGS 
+while getopts "BCnNoOpPsSuvhrUl:b:c:i:B:" ARGS 
     do
 	case ${ARGS} in
 	b) ABROWSER=${OPTARG} ;;
@@ -267,7 +267,7 @@ while getopts "BCnNoOpPsSuUvhrl:b:c:i:B:" ARGS
 	s) SHORT="true" ;;
 	S) SHORT="false" ;;
 	u) OUTPUTURL="true" ;;
-	U) OUTPUTURL="false" ;;
+	U) OPENURL="true";;
 	v) getVersion; exit 0 ;;
 	h) display_help; exit 0 ;;
 	*) display_help; exit 1 ;;
@@ -285,8 +285,9 @@ if [ -z "$1"  -a  -z "${RAND}" ]; then
 fi
 
 IGNCASE=$(echo ${IGNCASE:="false"})
-
 PAGER=$(echo ${PAGER:="false"})
+OPENURL=$(echo ${OPENURL:="false"})
+RAND=$(echo ${RAND:="false"})
 
 if [ "$PAGER" = "true" ]; then
     { PAGER=$(which less) || PAGER=$(which more) ; } || errorExit "No Pager found!" ;
@@ -300,6 +301,11 @@ COLOR=$(echo ${COLOR:="false"})
 if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
     PATT="$*"
 fi
+
+if [ "$OPENURL" = "true" ]; then
+    URL="$*"
+fi
+
 
 
 # Check for Alternative Browser
@@ -324,7 +330,6 @@ SHORT=$(echo ${SHORT:="false"})
 # Output only the URL?
 OUTPUTURL=$(echo ${OUTPUTURL:="false"})
 
-
 # Now we do some input sanitizing.
 ARGUMENT="$(uri_decode "$*")"
 LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
@@ -332,7 +337,9 @@ LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
 if [ "${RAND}" = "true" ]; then
     ARGUMENT="$(uri_decode "${RANDOMP}")"
 fi
-URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
+if [ -z $URL ]; then 
+    URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
+fi;
 
 #errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
 
