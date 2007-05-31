@@ -8,7 +8,7 @@
 # Author: Christian Brabandt <cb@256bit.org>
 # License: BSD
 
-VERSION=0.07
+VERSION=0.08
 
 set -e
 
@@ -32,6 +32,7 @@ SYNOPSIS
     -u	Just output the query URL	    -U	display article, not only url
     -v	display version			    -h	display help		   
 
+    -r          open Random Page
     -i patt	colorize pattern (case insensitive)
     -I patt	colorize pattern (case-sensitive, alias -c)
     -b prog	use prog as browser (by default to invoke elinks, links2,
@@ -74,98 +75,137 @@ fi
 echo -e "${OUTPUT}" 
 }
 
-function stripOutput(){
+function uri_decode(){
+echo -e "$*" |perl -MURI::Escape -lne 's/ /_/g;s/"//g;print uri_escape($_);'
+}
+
+function localize(){
+# Per default we use the english localized version of 
+# Wikipedia
+LOCAL=$(echo ${LOCAL:="en"})
 if [ "${LOCAL}" = "de" ]; then 
     MARKER='Diese Seite'
     MARKER2='Bearbeiten'
+    RANDOMP='Spezial:Zufällige Seite'
 elif [ "${LOCAL}" = "en" -o "${LOCAL}" = "simple" ]; then
     MARKER='Views'
     MARKER2='edit'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "fr" ]; then
     MARKER='Affichages'
     MARKER2='modifier'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "nl" ]; then
     MARKER='Views'
     MARKER2='bewerk'
+    RANDOMP='Speciaal:Willekeurig'
 elif [ "${LOCAL}" = "sv" ]; then
     MARKER='Visningar'
     MARKER2='redigera'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "es" ]; then
     MARKER='Views'
     MARKER2='editar'
+    RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "pt" ]; then
     MARKER='Vistas'
     MARKER2='editar'
+    RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "pl" ]; then
     MARKER='Views'
     MARKER2='Edytuj'
+    RANDOMP='Specjalna:Losowa_strona'
 elif [ "${LOCAL}" = "it" ]; then
     MARKER='Views'
     MARKER2='modifica'
+    RANDOMP='Speciale:PaginaCasuale'
 elif [ "${LOCAL}" = "da" ]; then
     MARKER='Views'
-    MARKER2='redig�r\\|rediger'
+    MARKER2='redigér\\|rediger'
+    RANDOMP='Speciel:Tilfældig_side'
 elif [ "${LOCAL}" = "eo" ]; then
     MARKER='Vidoj'
     MARKER2='redaktu'
+    RANDOMP='Speciala:Random'
 elif [ "${LOCAL}" = "no" ]; then
     MARKER='Visninger'
     MARKER2='rediger'
+    RANDOMP='Spesial:Tilfeldig_side'
 elif [ "${LOCAL}" = "nn" ]; then
     MARKER='Visningar'
     MARKER2='endre'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "fi" ]; then
     MARKER='Views'
     MARKER2='muokkaa'
+    RANDOMP='Toiminnot:Satunnainen_sivu'
 elif [ "${LOCAL}" = "ca" ]; then
     MARKER='Views'
     MARKER2='edita'
+    RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "ro" ]; then
     MARKER='Vizualizari'
     MARKER2='modifica'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "cs" ]; then
-    MARKER='Zobrazen�'
+    MARKER='Zobrazení'
     MARKER2='editovat'
+    RANDOMP='Speciální:Random'
 elif [ "${LOCAL}" = "sk" ]; then
-    MARKER='Zobrazen�'
-    MARKER2='�prava'
+    MARKER='Zobrazení'
+    MARKER2='úprava'
+    RANDOMP='Špeciálne:Random'
 elif [ "${LOCAL}" = "sl" ]; then
     MARKER='Ogledov'
     MARKER2='spremeni'
+    RANDOMP='Posebno:Random'
 elif [ "${LOCAL}" = "lb" ]; then
     MARKER='Views'
-    MARKER2='�nneren'
+    MARKER2='Änneren'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "la" ]; then
     MARKER='Views'
     MARKER2='recensere'
+    RANDOMP='Specialis:Random'
 elif [ "${LOCAL}" = "rm" ]; then
     MARKER='Views'
     MARKER2='edit'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "ia" ]; then
     MARKER='Views'
     MARKER2='modificar'
+    RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "is" ]; then
     MARKER='Views'
     MARKER2='breyta'
+    RANDOMP='Kerfissíða:Random'
 elif [ "${LOCAL}" = "hu" ]; then
     MARKER='Views'
-    MARKER2='szerkeszt�s'
+    MARKER2='szerkesztés'
+    RANDOMP='Speciális:Lap_találomra'
 elif [ "${LOCAL}" = "tr" ]; then
     MARKER='Views'
     MARKER2='degistir'
+    RANDOMP='Özel:Random'
 elif [ "${LOCAL}" = "af" ]; then
     MARKER='Views'
     MARKER2='wysig'
+    RANDOMP='Spesiaal:Random'
 elif [ "${LOCAL}" = "nds" ]; then
     MARKER='Views'
-    MARKER2='�nnern'
+    MARKER2='Ännern'
+    RANDOMP='Spezial:Random'
 elif [ "${LOCAL}" = "als" ]; then
     MARKER='Views'
-    MARKER2='�ndere'
+    MARKER2='ändere'
+    RANDOMP='Spezial:Zufällige_Seite'
 else
     MARKER='Views\\|References\\|Visible links'
+    RANDOMP='Special:Random'
 fi
+}
 
+function stripOutput(){
 # Now comes the magic: Strip everything from Marker to end,
 # cause this is only the linkdump
 
@@ -207,7 +247,7 @@ if [ -r ~/.`basename $0`rc ]; then
 fi
 
 # Process commandline parameters
-while getopts "BCnNoOpPsSuUvhl:b:c:i:B:" ARGS 
+while getopts "BCnNoOpPsSuUvhrl:b:c:i:B:" ARGS 
     do
 	case ${ARGS} in
 	b) ABROWSER=${OPTARG} ;;
@@ -223,6 +263,7 @@ while getopts "BCnNoOpPsSuUvhl:b:c:i:B:" ARGS
 	O) USEBROWSER="false" ;;
 	p) PAGER="true" ;;
 	P) PAGER="false" ;;
+	r) RAND="true" ;;
 	s) SHORT="true" ;;
 	S) SHORT="false" ;;
 	u) OUTPUTURL="true" ;;
@@ -235,9 +276,10 @@ done
 
 shift `expr ${OPTIND} - 1`
 
+localize
 
 # Setting Up some Variables, to determine, what actually to do
-if [ -z "$1" ]; then
+if [ -z "$1"  -a  -z "${RAND}" ]; then
     display_help
     exit 1;
 fi
@@ -259,9 +301,6 @@ if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
     PATT="$*"
 fi
 
-# Per default we use the english localized version of 
-# Wikipedia
-LOCAL=$(echo ${LOCAL:="en"})
 
 # Check for Alternative Browser
 if [ -n "${ABROWSER}" ]; then
@@ -285,9 +324,14 @@ SHORT=$(echo ${SHORT:="false"})
 # Output only the URL?
 OUTPUTURL=$(echo ${OUTPUTURL:="false"})
 
+
 # Now we do some input sanitizing.
-ARGUMENT="$(echo "$*" |perl -MURI::Escape -lne 's/ /_/g;s/"//g;print uri_escape($_);')"
+ARGUMENT="$(uri_decode "$*")"
 LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
+# Random page?
+if [ "${RAND}" = "true" ]; then
+    ARGUMENT="$(uri_decode "${RANDOMP}")"
+fi
 URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
 
 #errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
