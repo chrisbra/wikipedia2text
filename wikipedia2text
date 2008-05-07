@@ -8,7 +8,7 @@
 # Author: Christian Brabandt <cb@256bit.org>
 # License: BSD
 
-VERSION=0.08
+VERSION=0.09
 
 set -e
 
@@ -85,6 +85,7 @@ function localize(){
 LOCAL=$(echo ${LOCAL:="en"})
 if [ "${LOCAL}" = "de" ]; then 
     MARKER='Diese Seite'
+    MARKER='^Weblinks'
     MARKER2='Bearbeiten'
     RANDOMP='Spezial:Zufällige Seite'
 elif [ "${LOCAL}" = "en" -o "${LOCAL}" = "simple" ]; then
@@ -302,9 +303,9 @@ if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
     PATT="$*"
 fi
 
-if [ "$OPENURL" = "true" ]; then
-    URL="$*"
-fi
+#if [ "$OPENURL" = "true" ]; then
+#    URL="$*"
+#fi
 
 
 
@@ -337,11 +338,11 @@ LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
 if [ "${RAND}" = "true" ]; then
     ARGUMENT="$(uri_decode "${RANDOMP}")"
 fi
-if [ -z $URL ]; then 
+if [ -z "${URL}" ]; then 
     URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
 fi;
 
-#errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
+##errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
 
 # Depending on some Variables, we do some different things here
 if [ "${USEBROWSER}" = "true" ]; then
