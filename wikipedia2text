@@ -9,6 +9,7 @@
 # License: BSD
 
 VERSION=0.10
+ID=$ID
 
 set -e
 
