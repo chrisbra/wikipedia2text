@@ -8,7 +8,7 @@
 # Author: Christian Brabandt <cb@256bit.org>
 # License: BSD
 
-VERSION=0.09
+VERSION=0.10
 
 set -e
 
@@ -40,6 +40,9 @@ SYNOPSIS
     -l lang	use language (currently supported are: af, als, ca, cs, da, 
 		de, en, eo, es, fi, fr, hu, ia, is, it, la, lb, nds, nl, nn,
 		no, pl, pt, rm, ro, simple, sk, sl, sv, tr)
+    -W url      use url as base-URL for wikipedia (e.g. use a different 
+		Wiki, Querying this URL will happen by appending the search 
+		term.
 
     Query can be any term to search for at Wikipedia. Special
     characters will be taken care of. Note that only one query term is
@@ -85,7 +88,7 @@ function localize(){
 LOCAL=$(echo ${LOCAL:="en"})
 if [ "${LOCAL}" = "de" ]; then 
     #MARKER='Diese Seite'
-    MARKER='^\s*Kategorien:'
+    MARKER='^\s*Kategorien\?:'
 #    MARKER='Kategorien:'
     MARKER2='Bearbeiten'
     RANDOMP='Spezial:Zufällige Seite'
@@ -274,10 +277,11 @@ function getInfo(){
 # First read in the Run configuration File, if one is found 
 if [ -r ~/.`basename $0`rc ]; then
     source ~/.`basename $0`rc
+    ABROWSER=${BROWSER}
 fi
 
 # Process commandline parameters
-while getopts "BCnNoOpPsSuvhrUl:b:c:i:B:" ARGS 
+while getopts "BCnNoOpPsSuvhrUl:b:c:i:B:W:" ARGS 
     do
 	case ${ARGS} in
 	b) ABROWSER=${OPTARG} ;;
@@ -299,6 +303,7 @@ while getopts "BCnNoOpPsSuvhrUl:b:c:i:B:" ARGS
 	u) OUTPUTURL="true" ;;
 	U) OPENURL="true";;
 	v) getVersion; exit 0 ;;
+	W) WURL=${OPTARG} ;;
 	h) display_help; exit 0 ;;
 	*) display_help; exit 1 ;;
 	esac
@@ -332,9 +337,9 @@ if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
     PATT="$*"
 fi
 
-#if [ "$OPENURL" = "true" ]; then
-#    URL="$*"
-#fi
+if [ "$OPENURL" = "true" ]; then
+    URL="$*"
+fi
 
 
 
@@ -370,6 +375,13 @@ fi
 if [ -z "${URL}" ]; then 
     URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
 fi;
+
+if [ -n "${WURL}" ]; then
+    URL="${WURL}/${ARGUMENT}"
+    #LOCAL="en"
+    unset $LOCAL
+fi;
+
 
 #errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
 
