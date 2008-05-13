@@ -95,8 +95,7 @@ if [ "${LOCAL}" = "de" ]; then
     RANDOMP='Spezial:Zufällige Seite'
 elif [ "${LOCAL}" = "en" -o "${LOCAL}" = "simple" ]; then
     #MARKER='Views'
-    MARKER='^\s*Categories:'
-    MARKER2='edit'
+    MARKER='^\s*Categories:\|^\s*Category:'
     MARKER2='edit'
     RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "fr" ]; then
@@ -345,7 +344,7 @@ fi
 
 
 # Check for Alternative Browser
-if [ -n "${ABROWSER}" ]; then
+if [ -n "${ABROWSER}" -o "${BROWSER}" ]; then
     BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"  
 else
    { BROWSER=$(which w3m) || 
@@ -378,9 +377,16 @@ if [ -z "${URL}" ]; then
 fi;
 
 if [ -n "${WURL}" ]; then
-    URL="${WURL}/${ARGUMENT}"
+    WURL="$(echo "${WURL%%/}")"
+    case "${WURL}" in
+	http://*) URL="${WURL}"/"${ARGUMENT}" ;;
+	*) URL="http://""${WURL}"/"${ARGUMENT}" ;;
+    esac;
+    #URL="${WURL}/${ARGUMENT}"
     #LOCAL="en"
-    unset $LOCAL
+    # unset $LOCAL to force using an english-locale
+    # this is used to strip the tags [edit], eg.
+    LOCAL="en"
 fi;
 
 
