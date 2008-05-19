@@ -379,11 +379,9 @@ fi;
 if [ -n "${WURL}" ]; then
     WURL="$(echo "${WURL%%/}")"
     case "${WURL}" in
-	http://*) URL="${WURL}"/"${ARGUMENT}" ;;
-	*) URL="http://""${WURL}"/"${ARGUMENT}" ;;
+	http://*) URL="${WURL}"/wiki/"${ARGUMENT}" ;;
+	*) URL="http://""${WURL}"/wiki/"${ARGUMENT}" ;;
     esac;
-    #URL="${WURL}/${ARGUMENT}"
-    #LOCAL="en"
     # unset $LOCAL to force using an english-locale
     # this is used to strip the tags [edit], eg.
     LOCAL="en"
