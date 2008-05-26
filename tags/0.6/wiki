@@ -1,0 +1,320 @@
+#!/bin/bash --
+#
+# Shell script to query the Wikipedia.
+#
+# It can be used to output Wikipedia articles to the console, but can also 
+# just open the article in any browser.
+#
+# Author: Christian Brabandt <cb@256bit.org>
+# License: Public Domain
+
+VERSION=0.06
+
+set -e
+
+function display_help(){
+cat << EOF
+NAME
+
+    This script uses text-browser to query and render Wikipedia
+    articles. The output will be printed to standard out.
+    
+SYNOPSIS
+    `basename $0` [-BCnNoOpPsSuU] [-b prog] [-c patt] [-i patt] [-l lang] query
+    `basename $0` -o [-b prog] [-l lang] query
+    `basename $0` [-h]
+    `basename $0` -v
+   
+    -n	do not colorize			    -N	simple colorization (alias -C)
+    -p	display using a pager		    -P  don't use pager
+    -o	open Wikipedia article in browser   -O	don't open in browser
+    -s	display only a summary		    -S	display whole article
+    -u	Just output the query URL	    -U	display article, not only url
+    -v	display version			    -h	display help		   
+
+    -i patt	colorize pattern (case insensitive)
+    -I patt	colorize pattern (case-sensitive, alias -c)
+    -b prog	use prog as browser (by default to invoke elinks, links2,
+		links, lynx or w3m, if found)
+    -l lang	use language (currently supported are: af, als, ca, cs, da, 
+		de, en, eo, es, fi, fr, hu, ia, is, it, la, lb, nds, nl, nn,
+		no, pl, pt, rm, ro, simple, sk, sl, sv, tr)
+
+    Query can be any term to search for at Wikipedia. Special
+    characters will be taken care of. Note that only one query term is
+    supported, however this term can consist of one or more words.
+
+    Configuration can also be controlled by creating a runcontrol file
+    .`basename $0`rc your home directory.
+
+    Note that when requesting to open the article in a browser, other
+    parameters will be ignored. The same holds for the options -h and
+    -v.
+EOF
+}
+
+function getVersion(){
+cat <<EOF
+    $(basename "${0}") Version: ${VERSION}
+EOF
+}
+
+
+function errorExit(){
+    echo "$*" >&2
+    exit 3
+}
+
+function colorize(){
+if [ "${IGNCASE}" = "true" ]; then
+    OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|gi")
+else
+    OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|g")
+fi
+echo -e "${OUTPUT}" 
+}
+
+function stripOutput(){
+if [ "${LOCAL}" = "de" ]; then 
+    MARKER='Diese Seite'
+    MARKER2='Bearbeiten'
+elif [ "${LOCAL}" = "en" -o "${LOCAL}" = "simple" ]; then
+    MARKER='Views'
+    MARKER2='edit'
+elif [ "${LOCAL}" = "fr" ]; then
+    MARKER='Affichages'
+    MARKER2='modifier'
+elif [ "${LOCAL}" = "nl" ]; then
+    MARKER='Views'
+    MARKER2='bewerk'
+elif [ "${LOCAL}" = "sv" ]; then
+    MARKER='Visningar'
+    MARKER2='redigera'
+elif [ "${LOCAL}" = "es" ]; then
+    MARKER='Views'
+    MARKER2='editar'
+elif [ "${LOCAL}" = "pt" ]; then
+    MARKER='Vistas'
+    MARKER2='editar'
+elif [ "${LOCAL}" = "pl" ]; then
+    MARKER='Views'
+    MARKER2='Edytuj'
+elif [ "${LOCAL}" = "it" ]; then
+    MARKER='Views'
+    MARKER2='modifica'
+elif [ "${LOCAL}" = "da" ]; then
+    MARKER='Views'
+    MARKER2='redigér\\|rediger'
+elif [ "${LOCAL}" = "eo" ]; then
+    MARKER='Vidoj'
+    MARKER2='redaktu'
+elif [ "${LOCAL}" = "no" ]; then
+    MARKER='Visninger'
+    MARKER2='rediger'
+elif [ "${LOCAL}" = "nn" ]; then
+    MARKER='Visningar'
+    MARKER2='endre'
+elif [ "${LOCAL}" = "fi" ]; then
+    MARKER='Views'
+    MARKER2='muokkaa'
+elif [ "${LOCAL}" = "ca" ]; then
+    MARKER='Views'
+    MARKER2='edita'
+elif [ "${LOCAL}" = "ro" ]; then
+    MARKER='Vizualizari'
+    MARKER2='modifica'
+elif [ "${LOCAL}" = "cs" ]; then
+    MARKER='Zobrazení'
+    MARKER2='editovat'
+elif [ "${LOCAL}" = "sk" ]; then
+    MARKER='Zobrazení'
+    MARKER2='úprava'
+elif [ "${LOCAL}" = "sl" ]; then
+    MARKER='Ogledov'
+    MARKER2='spremeni'
+elif [ "${LOCAL}" = "lb" ]; then
+    MARKER='Views'
+    MARKER2='Änneren'
+elif [ "${LOCAL}" = "la" ]; then
+    MARKER='Views'
+    MARKER2='recensere'
+elif [ "${LOCAL}" = "rm" ]; then
+    MARKER='Views'
+    MARKER2='edit'
+elif [ "${LOCAL}" = "ia" ]; then
+    MARKER='Views'
+    MARKER2='modificar'
+elif [ "${LOCAL}" = "is" ]; then
+    MARKER='Views'
+    MARKER2='breyta'
+elif [ "${LOCAL}" = "hu" ]; then
+    MARKER='Views'
+    MARKER2='szerkesztés'
+elif [ "${LOCAL}" = "tr" ]; then
+    MARKER='Views'
+    MARKER2='degistir'
+elif [ "${LOCAL}" = "af" ]; then
+    MARKER='Views'
+    MARKER2='wysig'
+elif [ "${LOCAL}" = "nds" ]; then
+    MARKER='Views'
+    MARKER2='Ännern'
+elif [ "${LOCAL}" = "als" ]; then
+    MARKER='Views'
+    MARKER2='ändere'
+else
+    MARKER='Views\\|References\\|Visible links'
+fi
+
+# Now comes the magic: Strip everything from Marker to end,
+# cause this is only the linkdump
+
+SED='sed -e "/${MARKER}/,$ D" -e "s|\\[[0-9]*\\]||g" -e "s|\\[IMG\\]||g"'
+if [ -n "${MARKER2}" ]; then 
+    echo "`cat`"| eval ${SED} -e '"s|\[${MARKER2}\]||g"'
+else
+    echo "`cat`"| eval ${SED}
+fi
+}
+
+function openurl(){
+    "${BROWSER}" "${URL}"
+}
+
+function summary(){
+    if [ "${COLOR}" = "true" ]; then
+	"${BROWSER}" -dump "${URL}" |grep -v copyright | head -n 22 \
+	| tail -n 17  |stripOutput | colorize
+    else
+	"${BROWSER}" -dump "${URL}" |grep -v copyright | head -n 22 \
+	| tail -n 17  | stripOutput
+    fi
+}
+
+function getInfo(){
+    LINES=$("${BROWSER}" -dump "${URL}" |wc -l)
+    LINES=$(expr ${LINES} - 6)
+    if [ "${COLOR}" = "false" ]; then
+	"${BROWSER}" -dump "${URL}"| tail -n ${LINES}  |stripOutput  
+    else
+	"${BROWSER}" -dump "${URL}"| tail -n ${LINES}  |stripOutput |colorize 
+    fi
+}
+
+# First read in the Run configuration File, if one is found 
+if [ -r ~/.`basename $0`rc ]; then
+    source ~/.`basename $0`rc
+fi
+
+# Process commandline parameters
+while getopts "BCnNoOpPsSuUvhl:b:c:i:B:" ARGS 
+    do
+	case ${ARGS} in
+	b) ABROWSER=${OPTARG} ;;
+	B) ABROWSER='' ;;
+	c) IGNCASE="false";COLOR="true"; PATT=${OPTARG} ;;
+	C) COLOR="true" ;;
+	i) IGNCASE="true";COLOR="true"; PATT=${OPTARG} ;;
+	I) IGNCASE="false";COLOR="true"; PATT=${OPTARG} ;;
+	l) LOCAL=${OPTARG} ;;
+	n) COLOR="false" ;;
+	N) COLOR="true" ;;
+	o) USEBROWSER="true" ;;
+	O) USEBROWSER="false" ;;
+	p) PAGER="true" ;;
+	P) PAGER="false" ;;
+	s) SHORT="true" ;;
+	S) SHORT="false" ;;
+	u) OUTPUTURL="true" ;;
+	U) OUTPUTURL="false" ;;
+	v) getVersion; exit 0 ;;
+	h) display_help; exit 0 ;;
+	*) display_help; exit 1 ;;
+	esac
+done
+
+shift `expr ${OPTIND} - 1`
+
+
+# Setting Up some Variables, to determine, what actually to do
+if [ -z "$1" ]; then
+    display_help
+    exit 1;
+fi
+
+IGNCASE=$(echo ${IGNCASE:="false"})
+
+PAGER=$(echo ${PAGER:="false"})
+
+if [ "$PAGER" = "true" ]; then
+    { PAGER=$(which less) || PAGER=$(which more) ; } || errorExit "No Pager found!" ;
+fi
+#fi
+
+PAGER=$(echo ${PAGER/less/less -Rr})
+COLOR=$(echo ${COLOR:="false"})
+
+
+if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
+    PATT="$*"
+fi
+
+# Per default we use the english localized version of 
+# Wikipedia
+LOCAL=$(echo ${LOCAL:="en"})
+
+# Check for Alternative Browser
+if [ -n "${ABROWSER}" ]; then
+    BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"  
+else
+   { BROWSER=$(which elinks) || 
+     BROWSER=$(which links2) || 
+     BROWSER=$(which lynx) || 
+     BROWSER=$(which w3m) || 
+     BROWSER=$(which links.main) || 
+     BROWSER=$(which links) ; } || errorExit "No Browser found"
+fi
+
+
+# Open page in Browser?
+USEBROWSER=$(echo ${USEBROWSER:="false"})
+
+# Output only a summary?
+SHORT=$(echo ${SHORT:="false"})
+
+# Output only the URL?
+OUTPUTURL=$(echo ${OUTPUTURL:="false"})
+
+# Now translate the input into something, we can use for the Wikipedia
+ARGUMENT="$(echo "$*" |sed -e 's|ü|%C3%BC|g' -e 's|ä|%C3%A4|g' -e 's|ö|%C3%B6|g' -e 's|[[:space:]]|_|g' -e 's|\"||g' -e 's|ß|%C3%9F|g')"
+LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
+URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
+
+#errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE"
+
+# Depending on some Variables, we do some different things here
+if [ "${USEBROWSER}" = "true" ]; then
+    openurl 
+    exit 0;
+fi
+
+if [ "${SHORT}" = "true" ]; then
+    summary  
+    exit 0;
+fi
+
+if [ "${OUTPUTURL}" = "true" ]; then
+    if [ "${COLOR}" = "false" ]; then
+	echo "${URL}" 
+    else
+	echo -e "\033[0;34m${URL}\033[0m" 
+    fi
+    exit 0;
+fi
+
+if [ "$PAGER" != "false" ]; then
+    getInfo | ${PAGER}
+else
+    getInfo
+fi
+# vim: ft=sh
