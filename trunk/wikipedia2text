@@ -8,7 +8,7 @@
 # Author: Christian Brabandt <cb@256bit.org>
 # License: BSD
 
-VERSION=0.10
+VERSION=0.11
 # SVN-ID: $Id$:
 
 set -e
@@ -367,7 +367,7 @@ OUTPUTURL=$(echo ${OUTPUTURL:="false"})
 
 # Now we do some input sanitizing.
 ARGUMENT="$(uri_decode "$*")"
-LOCAL="$(echo "${LOCAL}"|tr [:upper:] [:lower:])"
+LOCAL="$(echo "${LOCAL}"|tr '[:upper:]' '[:lower:]')"
 # Random page?
 if [ "${RAND}" = "true" ]; then
     ARGUMENT="$(uri_decode "${RANDOMP}")"
