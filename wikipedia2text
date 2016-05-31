@@ -2,13 +2,12 @@
 #
 # Shell script to query the Wikipedia.
 #
-# It can be used to output Wikipedia articles to the console, but can also 
+# It can be used to output Wikipedia articles to the console, but can also
 # just open the article in any browser.
 #
 # Author: Christian Brabandt <cb@256bit.org>
 # License: BSD
-VERSION=0.11
-# SVN-ID: $Id$:
+VERSION=0.12
 
 set -e
 
@@ -18,19 +17,19 @@ NAME
 
     This script uses text-browser to query and render Wikipedia
     articles. The output will be printed to standard out.
-    
+
 SYNOPSIS
     `basename $0` [-BCnNoOpPsSuU] [-b prog] [-c patt] [-i patt] [-l lang] [-X browseroptions] query
     `basename $0` -o [-b prog] [-l lang] query
     `basename $0` [-h]
     `basename $0` -v|-r
-   
+
     -n	do not colorize			    -N	simple colorization (alias -C)
     -p	display using a pager		    -P  don't use pager
     -o	open Wikipedia article in browser   -O	don't open in browser
     -s	display only a summary		    -S	display whole article
     -u	Just output the query URL	    -U	open URL in browser
-    -v	display version			    -h	display help		   
+    -v	display version			    -h	display help
 
     -r                    open Random Page
     -i patt               colorize pattern (case insensitive)
@@ -77,7 +76,7 @@ if [ "${IGNCASE}" = "true" ]; then
 else
     OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|g")
 fi
-echo -e "${OUTPUT}" 
+echo -e "${OUTPUT}"
 }
 
 function uri_decode(){
@@ -85,10 +84,10 @@ echo -e "$*" |perl -MURI::Escape -lne 's/ /_/g;s/"//g;print uri_escape($_);'
 }
 
 function localize(){
-# Per default we use the english localized version of 
+# Per default we use the english localized version of
 # Wikipedia
 LOCAL=$(echo ${LOCAL:="en"})
-if [ "${LOCAL}" = "de" ]; then 
+if [ "${LOCAL}" = "de" ]; then
     #MARKER='Diese Seite'
     MARKER='^\s*Kategorien\?:'
 #    MARKER='Kategorien:'
@@ -243,7 +242,7 @@ function stripOutput(){
 # cause this is only the linkdump
 
 SED='sed -e "s|\\[[0-9]*\\]||g" -e "s|\\[IMG\\]||g" -e "/${MARKER}/,$ D" '
-if [ -n "${MARKER2}" ]; then 
+if [ -n "${MARKER2}" ]; then
     echo "`cat`"| eval ${SED} -e '"s#\[${MARKER2}\]##g"'
 else
     echo "`cat`"| eval ${SED}
@@ -275,7 +274,7 @@ function getInfo(){
     eval ${getInfoCommand}
 }
 
-# First read in the Run configuration File, if one is found 
+# First read in the Run configuration File, if one is found
 if [ -r ~/.`basename $0`rc ]; then
     source ~/.`basename $0`rc
     ABROWSER=${BROWSER}
@@ -345,13 +344,13 @@ fi
 
 # Check for Alternative Browser
 if [ -n "${ABROWSER}" -o "${BROWSER}" ]; then
-    BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"  
+    BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"
 else
-   { BROWSER=$(which w3m) || 
-     BROWSER=$(which elinks) || 
-     BROWSER=$(which links2) || 
-     BROWSER=$(which lynx) || 
-     BROWSER=$(which links.main) || 
+   { BROWSER=$(which w3m) ||
+     BROWSER=$(which elinks) ||
+     BROWSER=$(which links2) ||
+     BROWSER=$(which lynx) ||
+     BROWSER=$(which links.main) ||
      BROWSER=$(which links) ; } || errorExit "No Browser found"
 fi
 
@@ -372,7 +371,7 @@ LOCAL="$(echo "${LOCAL}"|tr '[:upper:]' '[:lower:]')"
 if [ "${RAND}" = "true" ]; then
     ARGUMENT="$(uri_decode "${RANDOMP}")"
 fi
-if [ -z "${URL}" ]; then 
+if [ -z "${URL}" ]; then
     URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
 fi;
 
@@ -392,12 +391,12 @@ fi;
 
 # Depending on some Variables, we do some different things here
 if [ "${USEBROWSER}" = "true" ]; then
-    openurl 
+    openurl
     exit 0;
 fi
 
 if [ "${SHORT}" = "true" ]; then
-    summary  
+    summary
     exit 0;
 fi
 
@@ -406,7 +405,7 @@ if [ "${OUTPUTURL}" = "true" ]; then
 	echo "${URL}"
 	echo "${BROWSER}" "${BROWSEROPTIONS}" -dump "${URL}"
     else
-	echo -e "\033[0;34m${URL}\033[0m" 
+	echo -e "\033[0;34m${URL}\033[0m"
     fi
     exit 0;
 fi
