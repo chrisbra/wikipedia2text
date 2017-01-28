@@ -60,27 +60,27 @@ EOF
 
 function getVersion(){
 cat <<EOF
-    $(basename "${0}") Version: ${VERSION}
+  $(basename "${0}") Version: ${VERSION}
 EOF
 }
 
 
 function errorExit(){
-    echo "$*" >&2
-    exit 3
+  echo "$*" >&2
+  exit 3
 }
 
 function colorize(){
 if [ "${IGNCASE}" = "true" ]; then
-    OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|gi")
+  OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|gi")
 else
-    OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|g")
+  OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|g")
 fi
 echo -e "${OUTPUT}"
 }
 
 function uri_decode(){
-echo -e "$*" |perl -MURI::Escape -lne 's/ /_/g;s/"//g;print uri_escape($_);'
+  echo -e "$*" |perl -MURI::Escape -lne 's/ /_/g;s/"//g;print uri_escape($_);'
 }
 
 function localize(){
@@ -88,152 +88,152 @@ function localize(){
 # Wikipedia
 LOCAL=$(echo ${LOCAL:="en"})
 if [ "${LOCAL}" = "de" ]; then
-    #MARKER='Diese Seite'
-    MARKER='^\s*Kategorien\?:'
+  #MARKER='Diese Seite'
+  MARKER='^\s*Kategorien\?:'
 #    MARKER='Kategorien:'
-    MARKER2='Bearbeiten'
-    RANDOMP='Spezial:Zufällige Seite'
+  MARKER2='Bearbeiten'
+  RANDOMP='Spezial:Zufällige Seite'
 elif [ "${LOCAL}" = "en" -o "${LOCAL}" = "simple" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Categories:\|^\s*Category:'
-    MARKER2='edit'
-    RANDOMP='Special:Random'
+  #MARKER='Views'
+  MARKER='^\s*Categories:\|^\s*Category:'
+  MARKER2='edit'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "fr" ]; then
 #    MARKER='Affichages'
-    MARKER='^\s*Catégories :'
-    MARKER2='modifier'
-    RANDOMP='Special:Random'
+  MARKER='^\s*Catégories :'
+  MARKER2='modifier'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "nl" ]; then
 #    MARKER='Views'
-    MARKER='^\s*Categorie:'
-    MARKER2='bewerk'
-    RANDOMP='Speciaal:Willekeurig'
+  MARKER='^\s*Categorie:'
+  MARKER2='bewerk'
+  RANDOMP='Speciaal:Willekeurig'
 elif [ "${LOCAL}" = "sv" ]; then
-    #MARKER='Visningar'
-    MARKER='^\s*Kategorier:'
-    MARKER2='redigera'
-    RANDOMP='Special:Random'
+  #MARKER='Visningar'
+  MARKER='^\s*Kategorier:'
+  MARKER2='redigera'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "es" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Categorías:'
-    MARKER2='editar'
-    RANDOMP='Especial:Random'
+  #MARKER='Views'
+  MARKER='^\s*Categorías:'
+  MARKER2='editar'
+  RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "pt" ]; then
-    #MARKER='Vistas'
-    MARKER='^\s*Categorias:'
-    MARKER2='editar'
-    RANDOMP='Especial:Random'
+  #MARKER='Vistas'
+  MARKER='^\s*Categorias:'
+  MARKER2='editar'
+  RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "pl" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Kategorie:'
-    MARKER2='Edytuj'
-    RANDOMP='Specjalna:Losowa_strona'
+  #MARKER='Views'
+  MARKER='^\s*Kategorie:'
+  MARKER2='Edytuj'
+  RANDOMP='Specjalna:Losowa_strona'
 elif [ "${LOCAL}" = "it" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Categorie:'
-    MARKER2='modifica'
-    RANDOMP='Speciale:PaginaCasuale'
+  #MARKER='Views'
+  MARKER='^\s*Categorie:'
+  MARKER2='modifica'
+  RANDOMP='Speciale:PaginaCasuale'
 elif [ "${LOCAL}" = "da" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Kategori:'
-    MARKER2='\(redigér\|rediger\)'
-    RANDOMP='Speciel:Tilfældig_side'
+  #MARKER='Views'
+  MARKER='^\s*Kategori:'
+  MARKER2='\(redigér\|rediger\)'
+  RANDOMP='Speciel:Tilfældig_side'
 elif [ "${LOCAL}" = "eo" ]; then
-    #MARKER='Vidoj'
-    MARKER='^\s*Kategorio:'
-    MARKER2='redaktu'
-    RANDOMP='Speciala:Random'
+  #MARKER='Vidoj'
+  MARKER='^\s*Kategorio:'
+  MARKER2='redaktu'
+  RANDOMP='Speciala:Random'
 elif [ "${LOCAL}" = "no" ]; then
-    #MARKER='Visninger'
-    MARKER='^\s*Kategorier:'
-    MARKER2='rediger'
-    RANDOMP='Spesial:Tilfeldig_side'
+  #MARKER='Visninger'
+  MARKER='^\s*Kategorier:'
+  MARKER2='rediger'
+  RANDOMP='Spesial:Tilfeldig_side'
 elif [ "${LOCAL}" = "nn" ]; then
-    #MARKER='Visningar'
-    MARKER='^\s*Kategoriar:'
-    MARKER2='endre'
-    RANDOMP='Special:Random'
+  #MARKER='Visningar'
+  MARKER='^\s*Kategoriar:'
+  MARKER2='endre'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "fi" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Luokat:'
-    MARKER2='muokkaa'
-    RANDOMP='Toiminnot:Satunnainen_sivu'
+  #MARKER='Views'
+  MARKER='^\s*Luokat:'
+  MARKER2='muokkaa'
+  RANDOMP='Toiminnot:Satunnainen_sivu'
 elif [ "${LOCAL}" = "ca" ]; then
-   # MARKER='Views'
-    MARKER='^\s*Categoria:'
-    MARKER2='edita'
-    RANDOMP='Especial:Random'
+  # MARKER='Views'
+  MARKER='^\s*Categoria:'
+  MARKER2='edita'
+  RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "ro" ]; then
-    #MARKER='Vizualizari'
-    MARKER='^\s*Categorii:'
-    MARKER2='modifica'
-    RANDOMP='Special:Random'
+  #MARKER='Vizualizari'
+  MARKER='^\s*Categorii:'
+  MARKER2='modifica'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "cs" ]; then
-    #MARKER='Zobrazení'
-    MARKER='^\s*Kategorie:'
-    MARKER2='editovat'
-    RANDOMP='Speciální:Random'
+  #MARKER='Zobrazení'
+  MARKER='^\s*Kategorie:'
+  MARKER2='editovat'
+  RANDOMP='Speciální:Random'
 elif [ "${LOCAL}" = "sk" ]; then
-    #MARKER='Zobrazení'
-    MARKER='^\s*Kategórie:'
-    MARKER2='úprava'
-    RANDOMP='Špeciálne:Random'
+  #MARKER='Zobrazení'
+  MARKER='^\s*Kategórie:'
+  MARKER2='úprava'
+  RANDOMP='Špeciálne:Random'
 elif [ "${LOCAL}" = "sl" ]; then
-    #MARKER='Ogledov'
-    MARKER='^\s*Kategorije:'
-    MARKER2='spremeni'
-    RANDOMP='Posebno:Random'
+  #MARKER='Ogledov'
+  MARKER='^\s*Kategorije:'
+  MARKER2='spremeni'
+  RANDOMP='Posebno:Random'
 elif [ "${LOCAL}" = "lb" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Kategorie:'
-    MARKER2='Änneren'
-    RANDOMP='Special:Random'
+  #MARKER='Views'
+  MARKER='^\s*Kategorie:'
+  MARKER2='Änneren'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "la" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Categoriae:'
-    MARKER2='recensere'
-    RANDOMP='Specialis:Random'
+  #MARKER='Views'
+  MARKER='^\s*Categoriae:'
+  MARKER2='recensere'
+  RANDOMP='Specialis:Random'
 elif [ "${LOCAL}" = "rm" ]; then
-    MARKER='Views'
-    MARKER2='edit'
-    RANDOMP='Special:Random'
+  MARKER='Views'
+  MARKER2='edit'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "ia" ]; then
-    MARKER='Views'
-    MARKER2='modificar'
-    RANDOMP='Special:Random'
+  MARKER='Views'
+  MARKER2='modificar'
+  RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "is" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Flokkar:'
-    MARKER2='breyta'
-    RANDOMP='Kerfissíða:Random'
+  #MARKER='Views'
+  MARKER='^\s*Flokkar:'
+  MARKER2='breyta'
+  RANDOMP='Kerfissíða:Random'
 elif [ "${LOCAL}" = "hu" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Kategóriák:'
-    MARKER2='szerkesztés'
-    RANDOMP='Speciális:Lap_találomra'
+  #MARKER='Views'
+  MARKER='^\s*Kategóriák:'
+  MARKER2='szerkesztés'
+  RANDOMP='Speciális:Lap_találomra'
 elif [ "${LOCAL}" = "tr" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Sayfa kategorisi:'
-    MARKER2='degistir'
-    RANDOMP='Özel:Random'
+  #MARKER='Views'
+  MARKER='^\s*Sayfa kategorisi:'
+  MARKER2='degistir'
+  RANDOMP='Özel:Random'
 elif [ "${LOCAL}" = "af" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Kategorieë: '
-    MARKER2='wysig'
-    RANDOMP='Spesiaal:Random'
+  #MARKER='Views'
+  MARKER='^\s*Kategorieë: '
+  MARKER2='wysig'
+  RANDOMP='Spesiaal:Random'
 elif [ "${LOCAL}" = "nds" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Kategorien:'
-    MARKER2='Ännern'
-    RANDOMP='Spezial:Random'
+  #MARKER='Views'
+  MARKER='^\s*Kategorien:'
+  MARKER2='Ännern'
+  RANDOMP='Spezial:Random'
 elif [ "${LOCAL}" = "als" ]; then
-    #MARKER='Views'
-    MARKER='^\s*Kategorie:'
-    MARKER2='ändere'
-    RANDOMP='Spezial:Zufällige_Seite'
+  #MARKER='Views'
+  MARKER='^\s*Kategorie:'
+  MARKER2='ändere'
+  RANDOMP='Spezial:Zufällige_Seite'
 else
-    MARKER='\(Views\|References\|Visible links\)'
-    RANDOMP='Special:Random'
+  MARKER='\(Views\|References\|Visible links\)'
+  RANDOMP='Special:Random'
 fi
 }
 
@@ -243,71 +243,68 @@ function stripOutput(){
 
 SED='sed -e "s|\\[[0-9]*\\]||g" -e "s|\\[IMG\\]||g" -e "/${MARKER}/,$ D" '
 if [ -n "${MARKER2}" ]; then
-    echo "`cat`"| eval ${SED} -e '"s#\[${MARKER2}\]##g"'
+  echo "`cat`"| eval ${SED} -e '"s#\[${MARKER2}\]##g"'
 else
-    echo "`cat`"| eval ${SED}
+  echo "`cat`"| eval ${SED}
 fi
 }
 
 function openurl(){
-    "${BROWSER}" "${URL}"
+  "${BROWSER}" "${URL}"
 }
 
 function summary(){
-    if [ "${COLOR}" = "true" ]; then
-	summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  |stripOutput | colorize"
-    else
-	summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput"
-    fi
-    eval ${summaryCommand}
+  if [ "${COLOR}" = "true" ]; then
+    summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  |stripOutput | colorize"
+  else
+    summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput"
+  fi
+  eval ${summaryCommand}
 }
 
 function getInfo(){
-    #LINES=$("${BROWSER}" -dump "${URL}" |wc -l)
-    #LINES=$(expr ${LINES} - 6)
-    if [ "${COLOR}" = "false" ]; then
-	#"${BROWSER}" "${BROWSEROPTIONS}" -dump "${URL}"| tail -n ${LINES}  |stripOutput
-	getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput"
-    else
-	getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput |colorize"
-    fi
-    eval ${getInfoCommand}
+  if [ "${COLOR}" = "false" ]; then
+    getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput"
+  else
+    getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput |colorize"
+  fi
+  eval ${getInfoCommand}
 }
 
 # First read in the Run configuration File, if one is found
 if [ -r ~/.`basename $0`rc ]; then
-    source ~/.`basename $0`rc
-    ABROWSER=${BROWSER}
+  source ~/.`basename $0`rc
+  ABROWSER=${BROWSER}
 fi
 
 # Process commandline parameters
 while getopts "BCnNoOpPsSuvhrUl:b:c:i:B:W:X:" ARGS
-    do
-	case ${ARGS} in
-	b) ABROWSER=${OPTARG} ;;
-	B) ABROWSER='' ;;
-	c) IGNCASE="false";COLOR="true"; PATT=${OPTARG} ;;
-	C) COLOR="true" ;;
-	i) IGNCASE="true";COLOR="true"; PATT=${OPTARG} ;;
-	I) IGNCASE="false";COLOR="true"; PATT=${OPTARG} ;;
-	l) LOCAL=${OPTARG} ;;
-	n) COLOR="false" ;;
-	N) COLOR="true" ;;
-	o) USEBROWSER="true" ;;
-	O) USEBROWSER="false" ;;
-	p) PAGER="true" ;;
-	P) PAGER="false" ;;
-	r) RAND="true" ;;
-	s) SHORT="true" ;;
-	S) SHORT="false" ;;
-	u) OUTPUTURL="true" ;;
-	U) OPENURL="true";;
-	v) getVersion; exit 0 ;;
-	W) WURL=${OPTARG} ;;
-	X) BROWSEROPTIONS=${OPTARG} ;;
-	h) display_help; exit 0 ;;
-	*) display_help; exit 1 ;;
-	esac
+  do
+  case ${ARGS} in
+    b) ABROWSER=${OPTARG} ;;
+    B) ABROWSER='' ;;
+    c) IGNCASE="false";COLOR="true"; PATT=${OPTARG} ;;
+    C) COLOR="true" ;;
+    i) IGNCASE="true";COLOR="true"; PATT=${OPTARG} ;;
+    I) IGNCASE="false";COLOR="true"; PATT=${OPTARG} ;;
+    l) LOCAL=${OPTARG} ;;
+    n) COLOR="false" ;;
+    N) COLOR="true" ;;
+    o) USEBROWSER="true" ;;
+    O) USEBROWSER="false" ;;
+    p) PAGER="true" ;;
+    P) PAGER="false" ;;
+    r) RAND="true" ;;
+    s) SHORT="true" ;;
+    S) SHORT="false" ;;
+    u) OUTPUTURL="true" ;;
+    U) OPENURL="true";;
+    v) getVersion; exit 0 ;;
+    W) WURL=${OPTARG} ;;
+    X) BROWSEROPTIONS=${OPTARG} ;;
+    h) display_help; exit 0 ;;
+    *) display_help; exit 1 ;;
+  esac
 done
 
 shift `expr ${OPTIND} - 1`
@@ -316,8 +313,8 @@ localize
 
 # Setting Up some Variables, to determine, what actually to do
 if [ -z "$1"  -a  -z "${RAND}" ]; then
-    display_help
-    exit 1;
+  display_help
+  exit 1;
 fi
 
 IGNCASE=$(echo ${IGNCASE:="false"})
@@ -326,32 +323,31 @@ OPENURL=$(echo ${OPENURL:="false"})
 RAND=$(echo ${RAND:="false"})
 
 if [ "$PAGER" = "true" ]; then
-    { PAGER=$(which less) || PAGER=$(which more) ; } || errorExit "No Pager found!" ;
+  { PAGER=$(which less) || PAGER=$(which more) ; } || errorExit "No Pager found!" ;
 fi
-#fi
 
 PAGER=$(echo ${PAGER/less/less -Rr})
 COLOR=$(echo ${COLOR:="false"})
 
 
 if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
-    PATT="$*"
+  PATT="$*"
 fi
 
 if [ "$OPENURL" = "true" ]; then
-    URL="$*"
+  URL="$*"
 fi
 
 # Check for Alternative Browser
 if [ -n "${ABROWSER}" -o "${BROWSER}" ]; then
-    BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"
+  BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"
 else
-   { BROWSER=$(which w3m) ||
-     BROWSER=$(which elinks) ||
-     BROWSER=$(which links2) ||
-     BROWSER=$(which lynx) ||
-     BROWSER=$(which links.main) ||
-     BROWSER=$(which links) ; } || errorExit "No Browser found"
+  { BROWSER=$(which w3m) ||
+    BROWSER=$(which elinks) ||
+    BROWSER=$(which links2) ||
+    BROWSER=$(which lynx) ||
+    BROWSER=$(which links.main) ||
+    BROWSER=$(which links) ; } || errorExit "No Browser found"
 fi
 
 
@@ -369,50 +365,49 @@ ARGUMENT="$(uri_decode "$*")"
 LOCAL="$(echo "${LOCAL}"|tr '[:upper:]' '[:lower:]')"
 # Random page?
 if [ "${RAND}" = "true" ]; then
-    ARGUMENT="$(uri_decode "${RANDOMP}")"
+  ARGUMENT="$(uri_decode "${RANDOMP}")"
 fi
 if [ -z "${URL}" ]; then
-    URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
+  URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
 fi;
 
 if [ -n "${WURL}" ]; then
-    WURL="$(echo "${WURL%%/}")"
-    case "${WURL}" in
-	http://*) URL="${WURL}"/wiki/"${ARGUMENT}" ;;
-	*) URL="http://""${WURL}"/wiki/"${ARGUMENT}" ;;
-    esac;
-    # unset $LOCAL to force using an english-locale
-    # this is used to strip the tags [edit], eg.
-    LOCAL="en"
+  WURL="$(echo "${WURL%%/}")"
+  case "${WURL}" in
+    http://*) URL="${WURL}"/wiki/"${ARGUMENT}" ;;
+    *) URL="http://""${WURL}"/wiki/"${ARGUMENT}" ;;
+  esac;
+  # unset $LOCAL to force using an english-locale
+  # this is used to strip the tags [edit], eg.
+  LOCAL="en"
 fi;
-
 
 #errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
 
 # Depending on some Variables, we do some different things here
 if [ "${USEBROWSER}" = "true" ]; then
-    openurl
-    exit 0;
+  openurl
+  exit 0;
 fi
 
 if [ "${SHORT}" = "true" ]; then
-    summary
-    exit 0;
+  summary
+  exit 0;
 fi
 
 if [ "${OUTPUTURL}" = "true" ]; then
-    if [ "${COLOR}" = "false" ]; then
-	echo "${URL}"
-	echo "${BROWSER}" "${BROWSEROPTIONS}" -dump "${URL}"
-    else
-	echo -e "\033[0;34m${URL}\033[0m"
-    fi
-    exit 0;
+  if [ "${COLOR}" = "false" ]; then
+    echo "${URL}"
+    echo "${BROWSER}" "${BROWSEROPTIONS}" -dump "${URL}"
+  else
+    echo -e "\033[0;34m${URL}\033[0m"
+  fi
+  exit 0;
 fi
 
 if [ "$PAGER" != "false" ]; then
-    getInfo | ${PAGER}
+  getInfo | ${PAGER}
 else
-    getInfo
+  getInfo
 fi
-# vim: ft=sh
+# vim: ft=sh et sts=-1 sw=0 ts=2
