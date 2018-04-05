@@ -339,8 +339,10 @@ if [ "$OPENURL" = "true" ]; then
 fi
 
 # Check for Alternative Browser
-if [ -n "${ABROWSER}" -o "${BROWSER}" ]; then
+if [ -n "${ABROWSER}" ]; then
   BROWSER=$(which "${ABROWSER}") ||  errorExit "${ABROWSER} not found"
+elif [ -n "${BROWSER}" ]; then
+  BROWSER=$(which "${BROWSER}") ||  errorExit "${BROWSER} not found"
 else
   { BROWSER=$(which w3m) ||
     BROWSER=$(which elinks) ||
