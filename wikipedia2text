@@ -250,7 +250,7 @@ if [ -r ~/.`basename $0`rc ]; then
 fi
 
 # Process commandline parameters
-while getopts "BCnNoOpPsSuvhrUl:b:c:i:B:W:X:" ARGS
+while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:" ARGS
   do
   case ${ARGS} in
     b) ABROWSER=${OPTARG} ;;
