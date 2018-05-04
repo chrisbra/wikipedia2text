@@ -36,8 +36,7 @@ SYNOPSIS
     -i patt      colorize pattern (case insensitive)
     -I patt      colorize pattern (case-sensitive, alias -c)
     -b prog      use prog as browser (by default to invoke
-                 elinks, links2,
-                 links, lynx or w3m, if found)
+                 elinks, links2, links, lynx or w3m, if found)
     -l lang      use language (currently supported are: af, als, ca, cs, da,
                  de, en, eo, es, fi, fr, hu, ia, is, it, la, lb, nds, nl, nn,
                  no, pl, pt, rm, ro, simple, sk, sl, sv, tr)
@@ -66,7 +65,6 @@ cat <<EOF
 EOF
 }
 
-
 function errorExit(){
   echo "$*" >&2
   exit 3
@@ -90,108 +88,86 @@ function localize(){
 # Wikipedia
 LOCAL=$(echo ${LOCAL:="en"})
 if [ "${LOCAL}" = "de" ]; then
-  #MARKER='Diese Seite'
   MARKER='^\s*Kategorien\?:'
-#    MARKER='Kategorien:'
   MARKER2='Bearbeiten'
   RANDOMP='Spezial:Zufällige Seite'
 elif [ "${LOCAL}" = "en" -o "${LOCAL}" = "simple" ]; then
-  #MARKER='Views'
   MARKER='^\s*Categories:\|^\s*Category:'
   MARKER2='edit'
   RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "fr" ]; then
-#    MARKER='Affichages'
   MARKER='^\s*Catégories :'
   MARKER2='modifier'
   RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "nl" ]; then
-#    MARKER='Views'
   MARKER='^\s*Categorie:'
   MARKER2='bewerk'
   RANDOMP='Speciaal:Willekeurig'
 elif [ "${LOCAL}" = "sv" ]; then
-  #MARKER='Visningar'
   MARKER='^\s*Kategorier:'
   MARKER2='redigera'
   RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "es" ]; then
-  #MARKER='Views'
   MARKER='^\s*Categorías:'
   MARKER2='editar'
   RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "pt" ]; then
-  #MARKER='Vistas'
   MARKER='^\s*Categorias:'
   MARKER2='editar'
   RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "pl" ]; then
-  #MARKER='Views'
   MARKER='^\s*Kategorie:'
   MARKER2='Edytuj'
   RANDOMP='Specjalna:Losowa_strona'
 elif [ "${LOCAL}" = "it" ]; then
-  #MARKER='Views'
   MARKER='^\s*Categorie:'
   MARKER2='modifica'
   RANDOMP='Speciale:PaginaCasuale'
 elif [ "${LOCAL}" = "da" ]; then
-  #MARKER='Views'
   MARKER='^\s*Kategori:'
   MARKER2='\(redigér\|rediger\)'
   RANDOMP='Speciel:Tilfældig_side'
 elif [ "${LOCAL}" = "eo" ]; then
-  #MARKER='Vidoj'
   MARKER='^\s*Kategorio:'
   MARKER2='redaktu'
   RANDOMP='Speciala:Random'
 elif [ "${LOCAL}" = "no" ]; then
-  #MARKER='Visninger'
   MARKER='^\s*Kategorier:'
   MARKER2='rediger'
   RANDOMP='Spesial:Tilfeldig_side'
 elif [ "${LOCAL}" = "nn" ]; then
-  #MARKER='Visningar'
   MARKER='^\s*Kategoriar:'
   MARKER2='endre'
   RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "fi" ]; then
-  #MARKER='Views'
   MARKER='^\s*Luokat:'
   MARKER2='muokkaa'
   RANDOMP='Toiminnot:Satunnainen_sivu'
 elif [ "${LOCAL}" = "ca" ]; then
-  # MARKER='Views'
   MARKER='^\s*Categoria:'
   MARKER2='edita'
   RANDOMP='Especial:Random'
 elif [ "${LOCAL}" = "ro" ]; then
-  #MARKER='Vizualizari'
   MARKER='^\s*Categorii:'
   MARKER2='modifica'
   RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "cs" ]; then
-  #MARKER='Zobrazení'
   MARKER='^\s*Kategorie:'
   MARKER2='editovat'
   RANDOMP='Speciální:Random'
 elif [ "${LOCAL}" = "sk" ]; then
-  #MARKER='Zobrazení'
   MARKER='^\s*Kategórie:'
   MARKER2='úprava'
   RANDOMP='Špeciálne:Random'
 elif [ "${LOCAL}" = "sl" ]; then
-  #MARKER='Ogledov'
   MARKER='^\s*Kategorije:'
   MARKER2='spremeni'
   RANDOMP='Posebno:Random'
 elif [ "${LOCAL}" = "lb" ]; then
-  #MARKER='Views'
   MARKER='^\s*Kategorie:'
   MARKER2='Änneren'
   RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "la" ]; then
-  #MARKER='Views'
   MARKER='^\s*Categoriae:'
   MARKER2='recensere'
   RANDOMP='Specialis:Random'
@@ -204,32 +180,26 @@ elif [ "${LOCAL}" = "ia" ]; then
   MARKER2='modificar'
   RANDOMP='Special:Random'
 elif [ "${LOCAL}" = "is" ]; then
-  #MARKER='Views'
   MARKER='^\s*Flokkar:'
   MARKER2='breyta'
   RANDOMP='Kerfissíða:Random'
 elif [ "${LOCAL}" = "hu" ]; then
-  #MARKER='Views'
   MARKER='^\s*Kategóriák:'
   MARKER2='szerkesztés'
   RANDOMP='Speciális:Lap_találomra'
 elif [ "${LOCAL}" = "tr" ]; then
-  #MARKER='Views'
   MARKER='^\s*Sayfa kategorisi:'
   MARKER2='degistir'
   RANDOMP='Özel:Random'
 elif [ "${LOCAL}" = "af" ]; then
-  #MARKER='Views'
   MARKER='^\s*Kategorieë: '
   MARKER2='wysig'
   RANDOMP='Spesiaal:Random'
 elif [ "${LOCAL}" = "nds" ]; then
-  #MARKER='Views'
   MARKER='^\s*Kategorien:'
   MARKER2='Ännern'
   RANDOMP='Spezial:Random'
 elif [ "${LOCAL}" = "als" ]; then
-  #MARKER='Views'
   MARKER='^\s*Kategorie:'
   MARKER2='ändere'
   RANDOMP='Spezial:Zufällige_Seite'
@@ -257,7 +227,7 @@ function openurl(){
 
 function summary(){
   if [ "${COLOR}" = "true" ]; then
-    summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  |stripOutput | colorize"
+    summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput | colorize"
   else
     summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput"
   fi
@@ -268,7 +238,7 @@ function getInfo(){
   if [ "${COLOR}" = "false" ]; then
     getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput"
   else
-    getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput |colorize"
+    getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput | colorize"
   fi
   eval ${getInfoCommand}
 }
