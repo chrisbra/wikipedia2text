@@ -7,7 +7,7 @@
 #
 # Author: Christian Brabandt <cb@256bit.org>
 # License: BSD
-VERSION=0.12
+VERSION=0.13
 
 set -e
 
@@ -19,31 +19,33 @@ NAME
     articles. The output will be printed to standard out.
 
 SYNOPSIS
-    `basename $0` [-BCnNoOpPsSuU] [-b prog] [-c patt] [-i patt] [-l lang] [-X browseroptions] query
+    `basename $0` [-BCnNoOpPsSuU] [-b prog] [-c patt] [-i patt] [-l lang]
+                   [-X browseroptions] query
     `basename $0` -o [-b prog] [-l lang] query
     `basename $0` [-h]
     `basename $0` -v|-r
 
-    -n	do not colorize			    -N	simple colorization (alias -C)
-    -p	display using a pager		    -P  don't use pager
-    -o	open Wikipedia article in browser   -O	don't open in browser
-    -s	display only a summary		    -S	display whole article
-    -u	Just output the query URL	    -U	open URL in browser
-    -v	display version			    -h	display help
+    -n  do not colorize         -N  simple colorization (alias -C)
+    -p  display using a pager   -P  don't use pager
+    -o  open Wikipedia article  -O  don't open in browser
+    -s  display only a summary  -S  display whole article
+    -u  output the query URL    -U  open URL in browser
+    -v  display version         -h  display help
 
-    -r                    open Random Page
-    -i patt               colorize pattern (case insensitive)
-    -I patt               colorize pattern (case-sensitive, alias -c)
-    -b prog               use prog as browser (by default to invoke elinks, links2,
-                          links, lynx or w3m, if found)
-    -l lang               use language (currently supported are: af, als, ca, cs, da,
-                          de, en, eo, es, fi, fr, hu, ia, is, it, la, lb, nds, nl, nn,
-                          no, pl, pt, rm, ro, simple, sk, sl, sv, tr)
-    -W url                use url as base-URL for wikipedia (e.g. use a different
-                          Wiki, Querying this URL will happen by appending the search
-                          term.
-    -X "browseroptions"   pass through options to browser, e.g., "-width 180"
-                          (warnings: must be in quotes; browser specific, not checked)
+    -r           open Random Page
+    -i patt      colorize pattern (case insensitive)
+    -I patt      colorize pattern (case-sensitive, alias -c)
+    -b prog      use prog as browser (by default to invoke
+                 elinks, links2,
+                 links, lynx or w3m, if found)
+    -l lang      use language (currently supported are: af, als, ca, cs, da,
+                 de, en, eo, es, fi, fr, hu, ia, is, it, la, lb, nds, nl, nn,
+                 no, pl, pt, rm, ro, simple, sk, sl, sv, tr)
+    -W url       use url as base-URL for wikipedia (e.g. use a different
+                 Wiki, Querying this URL will happen by appending the search
+                 term.
+    -X "options" pass through options to browser, e.g., "-width 180"
+                 (warnings: must be in quotes; browser specific, not checked)
 
     Query can be any term to search for at Wikipedia. Special
     characters will be taken care of. Note that only one query term is
