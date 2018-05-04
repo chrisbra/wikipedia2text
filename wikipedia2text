@@ -33,6 +33,7 @@ SYNOPSIS
     -v  display version         -h  display help
 
     -r           open Random Page
+    -d           debug mode
     -i patt      colorize pattern (case insensitive)
     -I patt      colorize pattern (case-sensitive, alias -c)
     -b prog      use prog as browser (by default to invoke
@@ -254,6 +255,7 @@ while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:" ARGS
   do
   case ${ARGS} in
     b) ABROWSER=${OPTARG} ;;
+    d) DEBUG="true" ;;
     B) ABROWSER='' ;;
     c) IGNCASE="false";COLOR="true"; PATT=${OPTARG} ;;
     C) COLOR="true" ;;
@@ -343,7 +345,7 @@ if [ "${RAND}" = "true" ]; then
 fi
 if [ -z "${URL}" ]; then
   URL="http://${LOCAL}.wikipedia.org/wiki/${ARGUMENT}"
-fi;
+fi
 
 if [ -n "${WURL}" ]; then
   WURL="$(echo "${WURL%%/}")"
@@ -354,9 +356,11 @@ if [ -n "${WURL}" ]; then
   # unset $LOCAL to force using an english-locale
   # this is used to strip the tags [edit], eg.
   LOCAL="en"
-fi;
+fi
 
-#errorExit "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL"
+if [ "${DEBUG:=false}" = "true" ]; then 
+  printf "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL Summary: $SHORT\n"
+fi
 
 # Depending on some Variables, we do some different things here
 if [ "${USEBROWSER}" = "true" ]; then
