@@ -11,7 +11,7 @@ VERSION=0.13
 
 set -e
 
-function display_help(){
+function display_help(){ #{{{1
 cat << EOF
 NAME
 
@@ -59,19 +59,16 @@ SYNOPSIS
     -v.
 EOF
 }
-
-function getVersion(){
+function getVersion(){ #{{{1
 cat <<EOF
   $(basename "${0}") Version: ${VERSION}
 EOF
 }
-
-function errorExit(){
+function errorExit(){ #{{{1
   echo "$*" >&2
   exit 3
 }
-
-function colorize(){
+function colorize(){ #{{{1
 if [ "${IGNCASE}" = "true" ]; then
   OUTPUT=$(echo -e "`cat`"|sed -s "s|\(${PATT}\)|\\\033\[0;31m\1\\\033\[0m|gi")
 else
@@ -79,12 +76,10 @@ else
 fi
 echo -e "${OUTPUT}"
 }
-
-function uri_decode(){
+function uri_decode(){ #{{{1
   echo -e "$*" |perl -MURI::Escape -lne 's/ /_/g;s/"//g;print uri_escape($_);'
 }
-
-function localize(){
+function localize(){ #{{{1
 # Per default we use the english localized version of
 # Wikipedia
 LOCAL=$(echo ${LOCAL:="en"})
@@ -209,8 +204,7 @@ else
   RANDOMP='Special:Random'
 fi
 }
-
-function stripOutput(){
+function stripOutput(){ #{{{1
 # Now comes the magic: Strip everything from Marker to end,
 # cause this is only the linkdump
 SED='sed -e "s|\\[[0-9]*\\]||g" -e "s|\\[IMG\\]||g" -e "/${MARKER}/,$ D" '
@@ -220,20 +214,17 @@ else
   echo "`cat`"| eval ${SED}
 fi
 }
-
-function openurl(){
+function openurl(){ #{{{1
   "${BROWSER}" "${URL}"
 }
-
-function summary(){
+function summary(){ #{{{1
   summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput"
   if [ "${COLOR}" = "true" ]; then
     summaryCommand="${summaryCommand} | colorize"
   fi
   eval ${summaryCommand}
 }
-
-function getInfo(){
+function getInfo(){ #{{{1
   getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput"
   if [ "${COLOR}" = "true" ]; then
     getInfoCommand="${getInfoCommand} | colorize"
@@ -241,13 +232,13 @@ function getInfo(){
   eval ${getInfoCommand}
 }
 
-# First read in the Run configuration File, if one is found
+# First read in the Run configuration File, if one is found #{{{1
 if [ -r ~/.`basename $0`rc ]; then
   source ~/.`basename $0`rc
   ABROWSER=${BROWSER}
 fi
 
-# Process commandline parameters
+# Process commandline parameters {{{1
 while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:" ARGS
   do
   case ${ARGS} in
@@ -280,6 +271,7 @@ done
 
 shift `expr ${OPTIND} - 1`
 
+# Init some variables {{{1
 localize
 
 # Setting Up some Variables, to determine, what actually to do
@@ -299,7 +291,6 @@ fi
 
 PAGER=$(echo ${PAGER/less/less -Rr})
 COLOR=$(echo ${COLOR:="false"})
-
 
 if [ "$COLOR" = "true" -a -z "${PATT}" ]; then
   PATT="$*"
@@ -332,7 +323,7 @@ SHORT=$(echo ${SHORT:="false"})
 # Output only the URL?
 OUTPUTURL=$(echo ${OUTPUTURL:="false"})
 
-# Now we do some input sanitizing.
+# Now we do some input sanitizing. {{{1
 ARGUMENT="$(uri_decode "$*")"
 LOCAL="$(echo "${LOCAL}"|tr '[:upper:]' '[:lower:]')"
 # Random page?
@@ -354,11 +345,12 @@ if [ -n "${WURL}" ]; then
   LOCAL="en"
 fi
 
+# Debug mode? {{{1
 if [ "${DEBUG:=false}" = "true" ]; then 
   printf "PAGER: $PAGER Browser: $BROWSER Local: $LOCAL COLOR: $COLOR PATT: $PATT IGNCASE: $IGNCASE URL: $URL Summary: $SHORT\n"
 fi
 
-# Depending on some Variables, we do some different things here
+# Depending on some Variables, we do some different things here {{{1
 if [ "${USEBROWSER}" = "true" ]; then
   openurl
   exit 0;
@@ -384,4 +376,5 @@ if [ "$PAGER" != "false" ]; then
 else
   getInfo
 fi
+# Vim Modeline {{{1
 # vim: ft=sh et sts=-1 sw=0 ts=2
