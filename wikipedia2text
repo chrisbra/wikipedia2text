@@ -213,7 +213,6 @@ fi
 function stripOutput(){
 # Now comes the magic: Strip everything from Marker to end,
 # cause this is only the linkdump
-
 SED='sed -e "s|\\[[0-9]*\\]||g" -e "s|\\[IMG\\]||g" -e "/${MARKER}/,$ D" '
 if [ -n "${MARKER2}" ]; then
   echo "`cat`"| eval ${SED} -e '"s#\[${MARKER2}\]##g"'
@@ -227,19 +226,17 @@ function openurl(){
 }
 
 function summary(){
+  summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput"
   if [ "${COLOR}" = "true" ]; then
-    summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput | colorize"
-  else
-    summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput"
+    summaryCommand="${summaryCommand} | colorize"
   fi
   eval ${summaryCommand}
 }
 
 function getInfo(){
-  if [ "${COLOR}" = "false" ]; then
-    getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput"
-  else
-    getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput | colorize"
+  getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput"
+  if [ "${COLOR}" = "true" ]; then
+    getInfoCommand="${getInfoCommand} | colorize"
   fi
   eval ${getInfoCommand}
 }
@@ -325,7 +322,6 @@ else
     BROWSER=$(which links.main) ||
     BROWSER=$(which links) ; } || errorExit "No Browser found"
 fi
-
 
 # Open page in Browser?
 USEBROWSER=$(echo ${USEBROWSER:="false"})
