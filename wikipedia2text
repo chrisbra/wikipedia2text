@@ -218,9 +218,13 @@ function openurl(){ #{{{1
   "${BROWSER}" "${URL}"
 }
 function summary(){ #{{{1
-  summaryCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} |grep -v copyright | head -n 22 | tail -n 17  | stripOutput"
+  TMPFILE="/tmp/wiki-sum.html"
   if [ "${COLOR}" = "true" ]; then
-    summaryCommand="${summaryCommand} | colorize"
+    summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 | sed -e \"\$
+d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput | colorize && rm $TMPFILE"
+  else
+    summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 | sed -e \"\$
+d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput && rm $TMPFILE"
   fi
   eval ${summaryCommand}
 }
