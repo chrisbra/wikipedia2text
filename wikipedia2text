@@ -207,7 +207,7 @@ fi
 function stripOutput(){ #{{{1
 # Now comes the magic: Strip everything from Marker to end,
 # cause this is only the linkdump
-SED='sed -e "s|\\[[0-9]*\\]||g" -e "s|\\[IMG\\]||g" -e "/${MARKER}/,$ D" '
+SED='sed -e "s|\^\?\\[[0-9]*\\]||g" -e "s|\\[IMG\\]||g" -e "/${MARKER}/,$ D" '
 if [ -n "${MARKER2}" ]; then
   echo "`cat`"| eval ${SED} -e '"s#\[${MARKER2}\]##g"'
 else
