@@ -31,6 +31,7 @@ SYNOPSIS
     -s  display only a summary  -S  display whole article
     -u  output the query URL    -U  open URL in browser
     -v  display version         -h  display help
+    -t  show available sections
 
     -r           open Random Page
     -d           debug mode
@@ -41,6 +42,7 @@ SYNOPSIS
     -l lang      use language (currently supported are: af, als, ca, cs, da,
                  de, en, eo, es, fi, fr, hu, ia, is, it, la, lb, nds, nl, nn,
                  no, pl, pt, rm, ro, simple, sk, sl, sv, tr)
+    -T custom    print custom section (anything in html h2 tag)
     -W url       use url as base-URL for wikipedia (e.g. use a different
                  Wiki, Querying this URL will happen by appending the search
                  term.
@@ -217,7 +219,7 @@ fi
 function openurl(){ #{{{1
   "${BROWSER}" "${URL}"
 }
-function summary(){ #{{{1
+function summary() { #{{{1
   TMPFILE="/tmp/wiki-sum_$$.html"
   if [ "${COLOR}" = "true" ]; then
     summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 |
@@ -227,6 +229,24 @@ function summary(){ #{{{1
       sed -e \"\$ d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput && rm $TMPFILE"
   fi
   eval ${summaryCommand}
+}
+function print_sections() { #{{{1
+  TMPFILE="/tmp/wiki-sections_$$.html"
+  Command="curl -s -L ${URL} | grep '\(</\?html\)\|\(</\?body\)\|\(<h[12]\)' |
+    sed -e 's/^.*<h2/<h2/' > $TMPFILE && w3m -dump $TMPFILE | stripOutput && rm $TMPFILE"
+  eval ${Command}
+}
+function print_section_detail() { #{{{1
+  TMPFILE="/tmp/wiki-section_$$.html"
+  Command="curl -s -L ${URL} |
+    sed -n -e '/\(<\/\?html\)\|\(<\/\?body\)\|\(<h1\)/p' -e \"/^.*<h2.*$*/,/^.*<\/h2.*>/p\" |
+    sed -e 's/^.*<h2/<h2/' > $TMPFILE && w3m -dump $TMPFILE | stripOutput"
+  if [ "${COLOR}" = "true" ]; then
+    eval "${Command} | colorize"
+  else
+    eval "${Command}"
+  fi
+  rm $TMPFILE
 }
 function getInfo(){ #{{{1
   getInfoCommand="${BROWSER} ${BROWSEROPTIONS} -dump ${URL} | stripOutput"
@@ -243,7 +263,7 @@ if [ -r ~/.`basename $0`rc ]; then
 fi
 
 # Process commandline parameters {{{1
-while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:-help" ARGS
+while getopts "BCdnNoOpPsStuvhrUl:b:c:i:I:B:T:W:X:-help" ARGS
   do
   case ${ARGS} in
     b) ABROWSER=${OPTARG} ;;
@@ -263,6 +283,8 @@ while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:-help" ARGS
     r) RAND="true" ;;
     s) SHORT="true" ;;
     S) SHORT="false" ;;
+    t) SECTION="show" ;;
+    T) SECTION=$OPTARG ;;
     u) OUTPUTURL="true" ;;
     U) OPENURL="true";;
     v) getVersion; exit 0 ;;
@@ -325,6 +347,9 @@ USEBROWSER=$(echo ${USEBROWSER:="false"})
 # Output only a summary?
 SHORT=$(echo ${SHORT:="false"})
 
+# custom Section
+SECTION=$(echo ${SECTION:=""})
+
 # Output only the URL?
 OUTPUTURL=$(echo ${OUTPUTURL:="false"})
 
@@ -363,6 +388,14 @@ fi
 
 if [ "${SHORT}" = "true" ]; then
   summary
+  exit 0;
+fi
+
+if [ "${SECTION}" = "show" ]; then
+  print_sections
+  exit 0;
+elif [ -n "${SECTION}" ]; then
+  print_section_detail ${SECTION}
   exit 0;
 fi
 
