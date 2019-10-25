@@ -220,11 +220,11 @@ function openurl(){ #{{{1
 function summary(){ #{{{1
   TMPFILE="/tmp/wiki-sum.html"
   if [ "${COLOR}" = "true" ]; then
-    summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 | sed -e \"\$
-d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput | colorize && rm $TMPFILE"
+    summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 |
+      sed -e \"\$ d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput | colorize && rm $TMPFILE"
   else
-    summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 | sed -e \"\$
-d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput && rm $TMPFILE"
+    summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 |
+      sed -e \"\$ d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput && rm $TMPFILE"
   fi
   eval ${summaryCommand}
 }
