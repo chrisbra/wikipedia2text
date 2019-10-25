@@ -243,7 +243,7 @@ if [ -r ~/.`basename $0`rc ]; then
 fi
 
 # Process commandline parameters {{{1
-while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:" ARGS
+while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:-help" ARGS
   do
   case ${ARGS} in
     b) ABROWSER=${OPTARG} ;;
@@ -269,6 +269,7 @@ while getopts "BCdnNoOpPsSuvhrUl:b:c:i:I:B:W:X:" ARGS
     W) WURL=${OPTARG} ;;
     X) BROWSEROPTIONS=${OPTARG} ;;
     h) display_help; exit 0 ;;
+    -help) display_help; exit 0 ;;
     *) display_help; exit 1 ;;
   esac
 done
