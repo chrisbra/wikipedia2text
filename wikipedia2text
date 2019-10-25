@@ -7,7 +7,7 @@
 #
 # Author: Christian Brabandt <cb@256bit.org>
 # License: BSD
-VERSION=0.13
+VERSION=0.14
 
 set -e
 
