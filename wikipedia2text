@@ -218,7 +218,7 @@ function openurl(){ #{{{1
   "${BROWSER}" "${URL}"
 }
 function summary(){ #{{{1
-  TMPFILE="/tmp/wiki-sum.html"
+  TMPFILE="/tmp/wiki-sum_$$.html"
   if [ "${COLOR}" = "true" ]; then
     summaryCommand="curl -s -L ${URL} | grep \/table -A400 | grep -v \/table  | grep \<div -m1 -B400 |
       sed -e \"\$ d\" > $TMPFILE && w3m -dump $TMPFILE | stripOutput | colorize && rm $TMPFILE"
